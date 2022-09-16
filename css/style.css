@@ -585,7 +585,7 @@ body {
   color: var(--red);
 }
 
-#content main form button {
+#content main form .btn-submit {
   padding: 10px 36px;
   background: transparent;
   color: var(--light-blue-yellow);
@@ -595,7 +595,7 @@ body {
   transition: 0.2s;
 }
 
-#content main form button:hover {
+#content main form .btn-submit:hover {
   color: var(--dark);
   border-color: var(--dark);
 }
@@ -622,7 +622,7 @@ body {
     grid-gap: unset;
   }
 
-  #content main form button {
+  #content main form .btn-submit {
     width: 100%;
   }
 }

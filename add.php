@@ -9,8 +9,8 @@
     $detail = $_POST['detail'];
     $file = $_FILES['upload'];
     $image_path = "";
-
-    if (isset($file)) {
+    
+    if (file_exists($file['tmp_name']) ||  is_uploaded_file($file['tmp_name'])) {
       $path = "./img/";
       $fileName = $file['name'];
       $tmpName = $file['tmp_name'];
@@ -143,7 +143,7 @@
               <label for="detail">รายละเอียด</label>
             </div>
 
-            <button type="submit" name="submit">Submit</button>
+            <button type="submit" name="submit" class="btn-submit">Submit</button>
           </form>
         </div>
       </div>
