@@ -1,27 +1,42 @@
 <?php 
   include("./config/connect.php");
-               
-  if (isset($_POST['submit'])) {
+
+  if (isset($_POST['submit'])) {    
+    $id = $_GET['id'];
     $name = $_POST['name'];
     $code = $_POST['code'];
     $stock = $_POST['stock'];
     $price = $_POST['price'];
     $detail = $_POST['detail'];
     $file = $_FILES['upload'];
-    $image_path = "";
+    $image_path = $_POST['image_path'];;
     
     if (file_exists($file['tmp_name']) ||  is_uploaded_file($file['tmp_name'])) {
       $path = "./img/";
       $fileName = $file['name'];
       $tmpName = $file['tmp_name'];
+      @unlink($path.$fileName);
       copy($tmpName, $path.$fileName);
       $image_path = $path.$fileName;
     }
 
-    $sql = "INSERT INTO product (code, name, stock, price, detail, image_path)
-            VALUES ('$code', '$name', '$stock', '$price', '$detail', '$image_path');";
+    $sql = "UPDATE product SET name='$name', code='$code', stock='$stock', price='$price', detail='$detail', image_path='$image_path'
+            WHERE id = '$id'";
     $query = mysqli_query($connect, $sql);
+
+    header( "location: index.php" );
+    exit(0);
   }
+               
+  $id = $_GET['id'];
+  if (!$id) {
+    header( "location: index.php" );
+    exit(0);
+  }
+
+  $sql = "SELECT * FROM product WHERE product.id = '$id'";
+  $query = mysqli_query($connect, $sql);
+  $data = mysqli_fetch_array($query);
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +73,7 @@
           <span class="text">ค้นหา</span>
         </a>
       </li>
-      <li class="active">
+      <li>
         <a href="add.php">
           <i class="bx bx-plus-circle"></i>
           <span class="text">เพิ่มสินค้า</span>
@@ -106,16 +121,26 @@
     <main>
       <div class="head-title">
         <div class="left">
-          <h1>เพิ่มสินค้า</h1>
+          <h1>แก้ไขสินค้า</h1>
         </div>
       </div>
 
       <div class="table-data">
         <div class="order">
-          <form action="add.php" method="post" enctype="multipart/form-data">
-            <div class="upload-wrapper">
+          <form action="edit.php?id=<?php echo $data['id']; ?>" method="post" enctype="multipart/form-data">
+            <div class="upload-wrapper <?php
+              if ($data['image_path']){
+                echo "active";
+              }
+            ?>">
               <div class="upload-image">
-                <img id="upload-image" src="">
+                <img id="upload-image" src="<?php
+                  if ($data['image_path']){
+                    echo $data['image_path'];
+                  }
+                ?>">
+
+                <input type="hidden" name="image_path" value="<?php echo $data['image_path'];  ?>">
               </div>
               <div class="upload-content">
                 <div class="upload-icon"><i class='bx bxs-cloud-upload'></i></div>
@@ -128,28 +153,38 @@
 
             <div class="form-inline">
               <div class="form">
-                <input type="text" id="name" name="name" required />
+                <input type="text" id="name" name="name" value="<?php echo $data['name']; ?>" <?php 
+                  if ($data['name']) { echo "class='valid'"; }
+                ?> required />
                 <label for="name">ชื่อสินค้า</label>
               </div>
               <div class="form">
-                <input type="text" id="code" name="code" required />
+                <input type="text" id="code" name="code" value="<?php echo $data['code']; ?>" <?php 
+                  if ($data['code']) { echo "class='valid'"; }
+                ?> required />
                 <label for="code">รหัส</label>
               </div>
             </div>
 
             <div class="form-inline">
               <div class="form">
-                <input type="number" id="stock" name="stock" required />
+                <input type="number" id="stock" name="stock" value="<?php echo $data['stock']; ?>" <?php 
+                  if ($data['stock']) { echo "class='valid'"; }
+                ?> required />
                 <label for="stock">จำนวน</label>
               </div>
               <div class="form">
-                <input type="number" step=".01" id="price" name="price" required />
+                <input type="number" step=".01" id="price" name="price" value="<?php echo $data['price']; ?>" <?php 
+                  if ($data['price']) { echo "class='valid'"; }
+                ?> required />
                 <label for="price">ราคา</label>
               </div>
             </div>
 
             <div class="form">
-              <textarea id="detail" name="detail" cols="30" rows="10"></textarea>
+              <textarea id="detail" name="detail" cols="30" rows="10" <?php 
+                  if ($data['detail']) { echo "class='valid'"; }
+                ?>><?php echo $data['detail']; ?></textarea>
               <label for="detail">รายละเอียด</label>
             </div>
 
@@ -175,7 +210,6 @@
       </div>
 
       <?php } ?>
-
     </main>
     <!-- MAIN -->
   </section>

@@ -20,6 +20,7 @@ li {
 
   --light: #f9f9f9;
   --blue: #3c91e6;
+  --purple: #9658fe;
   --light-blue: #cfe8ff;
   --grey: #eee;
   --dark-grey: #aaaaaa;
@@ -53,7 +54,7 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 280px;
+  width: 200px;
   height: 100%;
   background: var(--light);
   z-index: 2000;
@@ -160,8 +161,8 @@ body {
 /* CONTENT */
 #content {
   position: relative;
-  width: calc(100% - 280px);
-  left: 280px;
+  width: calc(100% - 200px);
+  left: 200px;
   transition: 0.3s ease;
 }
 #sidebar.hide ~ #content {
@@ -449,7 +450,7 @@ body {
   border-radius: 50%;
   object-fit: cover;
 }
-#content main .table-data .order table td button {
+#content main .table-data .order table td a {
   font-size: 14px;
   padding: 6px 20px;
   border: 2px solid transparent;
@@ -459,7 +460,7 @@ body {
   cursor: pointer;
   transition: 0.3s ease;
 }
-#content main .table-data .order table td button:hover {
+#content main .table-data .order table td a:hover {
   color: var(--dark);
 }
 #content main .table-data .order table tbody tr:hover {
@@ -639,6 +640,109 @@ body {
   font-size: 20px;
 }
 
+.upload-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  width: 50%;
+  height: 350px;
+  background: var(--light);
+  border: 2px dashed var(--dark-grey);
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+}
+.upload-wrapper.active {
+  border: none;
+}
+
+.upload-wrapper .upload-image {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.upload-wrapper .upload-content {
+  display: block;
+}
+
+.upload-wrapper.active .upload-content {
+  display: none;
+}
+
+.upload-wrapper .upload-image img {
+  display: none;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.upload-wrapper.active .upload-image img {
+  display: block;
+}
+
+.upload-wrapper .upload-icon {
+  font-size: 100px;
+  color: var(--purple);
+}
+
+.upload-wrapper .upload-text {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+.upload-wrapper #upload-cancel-btn {
+  position: absolute;
+  display: flex;
+  top: 15px;
+  right: 15px;
+  padding: 2px;
+  font-size: 20px;
+  border-radius: 50%;
+  background-color: var(--grey);
+  color: var(--dark-grey);
+  cursor: pointer;
+  opacity: 0;
+  transition: 0.2s ease;
+}
+
+.upload-wrapper.active:hover #upload-cancel-btn {
+  opacity: 1;
+}
+
+.upload-wrapper #upload-cancel-btn:hover {
+  color: var(--dark);
+}
+
+.upload-wrapper .upload-btn {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 10px 0;
+  color: var(--light);
+  border: none;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  outline: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.upload-wrapper.active .upload-btn {
+  opacity: 0;
+}
+
+.upload-wrapper.active:hover .upload-btn {
+  opacity: 1;
+}
+
 @media screen and (max-width: 576px) {
   #content nav form.show ~ .notification,
   #content nav form.show ~ .profile {
@@ -657,5 +761,11 @@ body {
   }
   #content main .table-data .todo .todo-list {
     min-width: 420px;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .upload-wrapper {
+    width: 100%;
   }
 }

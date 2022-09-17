@@ -21,7 +21,7 @@
 <body>
   <!-- SIDEBAR -->
   <section id="sidebar">
-    <a href="index.html" class="brand">
+    <a href="index.php" class="brand">
       <i class="bx bxs-speaker"></i>
       <span class="text">Speker</span>
     </a>
@@ -76,7 +76,7 @@
         <i class="bx bxs-bell"></i>
         <span class="num">8</span>
       </a>
-      <a href="profile.html" class="profile">
+      <a href="profile.php" class="profile">
         <img src="img/people.png" />
       </a>
     </nav>
@@ -127,14 +127,10 @@
                 <td><?php echo "$data[stock]"; ?></td>
                 <td><?php echo "$data[price]"; ?></td>
                 <td>
-                  <button class="completed">
-                    <i class="bx bx-edit"></i>
-                  </button>
+                  <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
                 </td>
                 <td>
-                  <button class="pending">
-                    <i class="bx bxs-edit-alt"></i>
-                  </button>
+                  <?php echo "<a href='delete.php?id=$data[id]' class='pending'><i class='bx bxs-edit-alt'></i></a>"; ?>
                 </td>
               </tr>
 

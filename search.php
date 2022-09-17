@@ -1,3 +1,16 @@
+<?php 
+  include("./config/connect.php");
+
+  $data = '';
+  if (isset($_GET['submit'])) {
+    $code = $_GET['code'];
+
+    $sql = "SELECT * FROM product WHERE code = '$code'";
+    $query = mysqli_query($connect, $sql);
+    $data = mysqli_fetch_array($query);    
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,7 +28,7 @@
 <body>
   <!-- SIDEBAR -->
   <section id="sidebar">
-    <a href="index.html" class="brand">
+    <a href="index.php" class="brand">
       <i class="bx bxs-speaker"></i>
       <span class="text">Speker</span>
     </a>
@@ -86,10 +99,10 @@
 
       <div class="table-data">
         <div class="todo">
-          <form action="#">
+          <form action="search.php" method="get">
             <div class="form-input">
-              <input type="search" placeholder="Search..." />
-              <button type="submit" class="search-btn">
+              <input type="search" name="code" placeholder="Search..." />
+              <button type="submit" name="submit" class="search-btn">
                 <i class="bx bx-search"></i>
               </button>
             </div>
@@ -112,47 +125,33 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <img src="img/A6X.jpg" />
-                  <p>A6Max</p>
-                </td>
-                <td>SP01</td>
-                <td>01-10-2021</td>
-                <td>5</td>
-                <td>2,990</td>
-                <td>
-                  <button class="completed">
-                    <i class="bx bx-edit"></i>
-                  </button>
-                </td>
-                <td>
-                  <button class="pending">
-                    <i class="bx bxs-edit-alt"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php
+                if ($data) {
+              ?>
 
               <tr>
                 <td>
-                  <img src="img/S3.jpg" />
-                  <p>ลำโพงบลูทูธ วินเทจ S3</p>
+                  <?php echo "<img src = '$data[image_path]'/>"; ?>
+                  <p><?php echo "$data[name]"; ?></p>
                 </td>
-                <td>S3</td>
-                <td>01-10-2021</td>
-                <td>5</td>
-                <td>890</td>
+                <td><?php echo "$data[code]"; ?></td>
                 <td>
-                  <button class="completed">
-                    <i class="bx bx-edit"></i>
-                  </button>
+                  <?php                    
+                    $date = date('d/m/Y', strtotime($data["create_date"]));
+                    echo "$date"; 
+                  ?>
+                </td>
+                <td><?php echo "$data[stock]"; ?></td>
+                <td><?php echo "$data[price]"; ?></td>
+                <td>
+                  <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
                 </td>
                 <td>
-                  <button class="pending">
-                    <i class="bx bxs-edit-alt"></i>
-                  </button>
+                  <?php echo "<a href='delete.php?id=$data[id]' class='pending'><i class='bx bxs-edit-alt'></i></a>"; ?>
                 </td>
               </tr>
+
+              <?php } ?>
             </tbody>
           </table>
         </div>
