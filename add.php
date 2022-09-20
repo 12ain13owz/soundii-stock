@@ -1,6 +1,17 @@
 <?php 
   include("./config/connect.php");
-               
+  session_start();
+
+  $id = $_SESSION['id'];
+  if (!$id) {
+    header( "location: login.php" );
+    exit(0);
+  } else {  
+    $username = $_SESSION['username'];
+    $role = $_SESSION['role'];
+  }
+
+  $query = "";             
   if (isset($_POST['submit'])) {
     $name = $_POST['name'];
     $code = $_POST['code'];
@@ -9,18 +20,26 @@
     $detail = $_POST['detail'];
     $file = $_FILES['upload'];
     $image_path = "";
-    
-    if (file_exists($file['tmp_name']) ||  is_uploaded_file($file['tmp_name'])) {
-      $path = "./img/";
-      $fileName = $file['name'];
-      $tmpName = $file['tmp_name'];
-      copy($tmpName, $path.$fileName);
-      $image_path = $path.$fileName;
-    }
 
-    $sql = "INSERT INTO product (code, name, stock, price, detail, image_path)
-            VALUES ('$code', '$name', '$stock', '$price', '$detail', '$image_path');";
+    $sql = "SELECT * FROM product WHERE product.code = '$code'";
     $query = mysqli_query($connect, $sql);
+    $rows = mysqli_num_rows($query);
+
+    if ($rows != 1) {        
+      if (file_exists($file['tmp_name']) ||  is_uploaded_file($file['tmp_name'])) {
+        $path = "./img/";
+        $fileName = $file['name'];
+        $tmpName = $file['tmp_name'];
+        copy($tmpName, $path.$fileName);
+        $image_path = $path.$fileName;
+      }
+
+      $sql = "INSERT INTO product (code, name, stock, price, detail, image_path)
+              VALUES ('$code', '$name', '$stock', '$price', '$detail', '$image_path');";
+      $query = mysqli_query($connect, $sql);
+    } else {
+      $query = "";
+    }
   }
 ?>
 
@@ -64,6 +83,12 @@
           <span class="text">เพิ่มสินค้า</span>
         </a>
       </li>
+      <li>
+        <a href="log.php">
+          <i class='bx bx-spreadsheet'></i>
+          <span class="text">ประวัติ</span>
+        </a>
+      </li>
     </ul>
 
     <ul class="side-menu">
@@ -74,7 +99,7 @@
         </a>
       </li>
       <li>
-        <a href="login.php" class="logout">
+        <a href="logout.php" class="logout">
           <i class="bx bx-log-out"></i>
           <span class="text">ออกจากระบบ</span>
         </a>
@@ -97,7 +122,7 @@
         <span class="num">8</span>
       </a>
       <a href="profile.php" class="profile">
-        <img src="img/people.png" />
+        <?php echo $username; ?>
       </a>
     </nav>
     <!-- NAVBAR -->
@@ -109,6 +134,24 @@
           <h1>เพิ่มสินค้า</h1>
         </div>
       </div>
+
+      <?php 
+        if (isset($_POST['submit'])) {          
+      ?>
+
+      <div class="table-data">
+        <div class="order">
+          <?php             
+            if ($query) {
+              echo "<span class='message-success'>เพิ่มข้อมูลสำเร็จ</span>";
+            } else {
+              echo "<span class='message-error'>รหัสซ้ำ เพิ่มข้อมูลไม่สำเร็จ</span>";
+            }             
+          ?>
+        </div>
+      </div>
+
+      <?php } ?>
 
       <div class="table-data">
         <div class="order">
@@ -128,12 +171,12 @@
 
             <div class="form-inline">
               <div class="form">
-                <input type="text" id="name" name="name" required />
-                <label for="name">ชื่อสินค้า</label>
-              </div>
-              <div class="form">
                 <input type="text" id="code" name="code" required />
                 <label for="code">รหัส</label>
+              </div>
+              <div class="form">
+                <input type="text" id="name" name="name" required />
+                <label for="name">ชื่อสินค้า</label>
               </div>
             </div>
 
@@ -157,25 +200,6 @@
           </form>
         </div>
       </div>
-
-      <?php 
-        if (isset($_POST['submit'])) {          
-      ?>
-
-      <div class="table-data">
-        <div class="order">
-          <?php             
-            if ($query) {
-              echo "<span class='message-success'>เพิ่มข้อมูลสำเร็จ</span>";
-            } else {
-              echo "<span class='message-error'>เพิ่มข้อมูลสำเร็จ</span>";
-            }             
-          ?>
-        </div>
-      </div>
-
-      <?php } ?>
-
     </main>
     <!-- MAIN -->
   </section>

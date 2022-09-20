@@ -11,7 +11,7 @@
     $role = $_SESSION['role'];
   }
   
-  $sql = "SELECT * FROM product ORDER BY product.create_date DESC";
+  $sql = "SELECT * FROM log INNER JOIN product ON log.id_product = product.id ORDER BY log.datetime DESC ";
   $query = mysqli_query($connect, $sql);
 ?>
 
@@ -37,7 +37,7 @@
       <span class="text">Speker</span>
     </a>
     <ul class="side-menu top">
-      <li class="active">
+      <li>
         <a href="index.php">
           <i class="bx bxs-dashboard"></i>
           <span class="text">หน้าแรก</span>
@@ -55,7 +55,7 @@
           <span class="text">เพิ่มสินค้า</span>
         </a>
       </li>
-      <li>
+      <li class="active">
         <a href="log.php">
           <i class='bx bx-spreadsheet'></i>
           <span class="text">ประวัติ</span>
@@ -117,11 +117,9 @@
               <tr>
                 <th>ชื่อสินค้า</th>
                 <th>รหัส</th>
-                <th>วันที่เพิ่ม</th>
+                <th>วันที่ตัด</th>
                 <th>จำนวน</th>
-                <th>ราคา</th>
-                <th>แก้ไข</th>
-                <th>ลบ</th>
+                <th>รายละเอียด</th>
               </tr>
             </thead>
             <tbody>
@@ -137,20 +135,20 @@
                 <td><?php echo "$data[code]"; ?></td>
                 <td>
                   <?php                    
-                    $date = date('d/m/Y', strtotime($data["create_date"]));
+                    $date = date('d/m/Y', strtotime($data["datetime"]));
                     echo "$date"; 
                   ?>
                 </td>
-                <td><?php echo "$data[stock]"; ?></td>
-                <td><?php echo "$data[price]"; ?></td>
                 <td>
-                  <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
+                  <?php 
+                    if ($data['status'] == 0) {
+                      echo "<span class='text-blue'>$data[amount]</span>";
+                    } else if ($data['status'] == 1) {
+                      echo "<span class='text-red'>-$data[amount]</span>";
+                    }
+                  ?>
                 </td>
-                <td>
-                  <button type="button"
-                    onclick="onPopup('<?php echo $data['name'];?>', '<?php echo 'delete.php?id='.$data['id'];?>')"
-                    class="pending"><i class='bx bx-x'></i></a></button>
-                </td>
+                <td><?php echo "$data[specs]"; ?></td>
               </tr>
               <?php } ?>
             </tbody>

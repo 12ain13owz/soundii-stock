@@ -1,5 +1,15 @@
 <?php 
   include("./config/connect.php");
+  session_start();
+
+  $id = $_SESSION['id'];
+  if (!$id) {
+    header( "location: login.php" );
+    exit(0);
+  } else {  
+    $username = $_SESSION['username'];
+    $role = $_SESSION['role'];
+  }
 
   $data = '';
   if (isset($_GET['submit'])) {
@@ -51,6 +61,12 @@
           <span class="text">เพิ่มสินค้า</span>
         </a>
       </li>
+      <li>
+        <a href="log.php">
+          <i class='bx bx-spreadsheet'></i>
+          <span class="text">ประวัติ</span>
+        </a>
+      </li>
     </ul>
 
     <ul class="side-menu">
@@ -61,7 +77,7 @@
         </a>
       </li>
       <li>
-        <a href="login.php" class="logout">
+        <a href="logout.php" class="logout">
           <i class="bx bx-log-out"></i>
           <span class="text">ออกจากระบบ</span>
         </a>
@@ -83,8 +99,8 @@
         <i class="bx bxs-bell"></i>
         <span class="num">8</span>
       </a>
-      <a href="profile" class="profile">
-        <img src="img/people.png" />
+      <a href="profile.php" class="profile">
+        <?php echo $username; ?>
       </a>
     </nav>
     <!-- NAVBAR -->

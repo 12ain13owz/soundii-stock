@@ -1,11 +1,19 @@
 <?php 
   include("./config/connect.php");
+  session_start();
+
+  $id = $_SESSION['id'];
+  if (!$id) {
+    header( "location: login.php" );
+    exit(0);
+  } else {  
+    $username = $_SESSION['username'];
+    $role = $_SESSION['role'];
+  }
 
   if (isset($_POST['submit'])) {    
     $id = $_GET['id'];
-    $name = $_POST['name'];
-    $code = $_POST['code'];
-    $stock = $_POST['stock'];
+    $name = $_POST['name'];    
     $price = $_POST['price'];
     $detail = $_POST['detail'];
     $file = $_FILES['upload'];
@@ -20,11 +28,36 @@
       $image_path = $path.$fileName;
     }
 
-    $sql = "UPDATE product SET name='$name', code='$code', stock='$stock', price='$price', detail='$detail', image_path='$image_path'
+    $sql = "UPDATE product SET name='$name',price='$price', detail='$detail', image_path='$image_path'
             WHERE id = '$id'";
     $query = mysqli_query($connect, $sql);
-
+       
     header( "location: index.php" );
+    exit(0);
+  }
+
+  if (isset($_POST['submitStock'])) {    
+    $id = $_GET['id'];
+    $select = $_POST['select'];    
+    $stock = $_POST['stock'];
+    $cut = $_POST['cut'];
+    $specs = $_POST['specs'];
+    $amount = 0;
+
+    if ($select == 0) {
+      $amount = $stock + $cut;
+    } elseif ($select == 1){
+      $amount = $stock - $cut;
+    }
+    
+    $sql = "UPDATE product SET stock='$amount' WHERE id = '$id'";
+    $query = mysqli_query($connect, $sql);
+
+    $sql = "INSERT INTO log (id_product, amount, specs, status)
+            VALUES ('$id', '$cut', '$specs', '$select');";
+    $query = mysqli_query($connect, $sql);
+    
+    header( "location: log.php" );
     exit(0);
   }
                
@@ -79,6 +112,12 @@
           <span class="text">เพิ่มสินค้า</span>
         </a>
       </li>
+      <li>
+        <a href="log.php">
+          <i class='bx bx-spreadsheet'></i>
+          <span class="text">ประวัติ</span>
+        </a>
+      </li>
     </ul>
 
     <ul class="side-menu">
@@ -89,7 +128,7 @@
         </a>
       </li>
       <li>
-        <a href="login.php" class="logout">
+        <a href="logout.php" class="logout">
           <i class="bx bx-log-out"></i>
           <span class="text">ออกจากระบบ</span>
         </a>
@@ -112,7 +151,7 @@
         <span class="num">8</span>
       </a>
       <a href="profile.php" class="profile">
-        <img src="img/people.png" />
+        <?php echo $username; ?>
       </a>
     </nav>
     <!-- NAVBAR -->
@@ -153,16 +192,16 @@
 
             <div class="form-inline">
               <div class="form">
+                <input type="text" id="code" name="code" value="<?php echo $data['code']; ?>" <?php 
+                  if ($data['code']) { echo "class='valid'"; }
+                ?> disabled />
+                <label for="code">รหัส</label>
+              </div>
+              <div class="form">
                 <input type="text" id="name" name="name" value="<?php echo $data['name']; ?>" <?php 
                   if ($data['name']) { echo "class='valid'"; }
                 ?> required />
                 <label for="name">ชื่อสินค้า</label>
-              </div>
-              <div class="form">
-                <input type="text" id="code" name="code" value="<?php echo $data['code']; ?>" <?php 
-                  if ($data['code']) { echo "class='valid'"; }
-                ?> required />
-                <label for="code">รหัส</label>
               </div>
             </div>
 
@@ -170,7 +209,7 @@
               <div class="form">
                 <input type="number" id="stock" name="stock" value="<?php echo $data['stock']; ?>" <?php 
                   if ($data['stock']) { echo "class='valid'"; }
-                ?> required />
+                ?> disabled />
                 <label for="stock">จำนวน</label>
               </div>
               <div class="form">
@@ -210,6 +249,64 @@
       </div>
 
       <?php } ?>
+
+      <div class="head-title" style="margin-top: 40px;">
+        <div class="left">
+          <h1>จัดการสต็อก</h1>
+        </div>
+      </div>
+
+      <div class="table-data">
+        <div class="order">
+          <form action="edit.php?id=<?php echo $data['id']; ?>" method="post">
+            <input type="number" id="stock2" name="stock" value="<?php echo $data['stock']; ?>" hidden />
+
+            <div class="radio-box">
+              <input type="radio" name="select" id="option1" value="0">
+              <input type="radio" name="select" id="option2" value="1">
+
+              <label for="option1" class="option-1">
+                <div class="dot"></div>
+                <div class="text">เพิ่มสต็อก</div>
+              </label>
+              <label for="option2" class="option-2">
+                <div class="dot"></div>
+                <div class="text">ตัดสต็อก</div>
+              </label>
+            </div>
+
+            <div class="form">
+              <input type="number" id="cut" name="cut" value="" required />
+              <label for="stock">จำนวน</label>
+            </div>
+
+            <div class="form">
+              <textarea id="specs" name="specs" cols="30" rows="10"></textarea>
+              <label for="detail">รายละเอียด</label>
+            </div>
+
+            <button type="submit" name="submitStock" class="btn-submit">Submit</button>
+          </form>
+        </div>
+      </div>
+
+      <?php 
+        if (isset($_POST['submit'])) {          
+      ?>
+
+      <div class="table-data">
+        <div class="order">
+          <?php             
+            if ($query) {
+              echo "<span class='message-success'>เพิ่มข้อมูลสำเร็จ</span>";
+            } else {
+              echo "<span class='message-error'>เพิ่มข้อมูลสำเร็จ</span>";
+            }             
+          ?>
+        </div>
+      </div>
+
+      <?php } ?>
     </main>
     <!-- MAIN -->
   </section>
@@ -220,3 +317,22 @@
 
 <script src="./js/script.js"></script>
 <script src="./js/form.js"></script>
+<script>
+const stock2 = Number(document.querySelector('#stock2').value)
+const cut = document.querySelector('#cut')
+
+cut.addEventListener("input", function() {
+  const select = document.querySelector('input[name="select"]:checked').value;
+  let value = cut.value || 0
+
+  if (select == 0) {
+    if (value < 1) cut.value = 1
+  } else if (select == 1) {
+    if (value > stock2) cut.value = stock2
+  }
+
+
+
+
+})
+</script>
