@@ -1,5 +1,5 @@
 <?php 
-  include("./config/connect.php");
+  include("./config/connect.php");  
   session_start();
 
   $id = $_SESSION['id'];
@@ -8,7 +8,7 @@
     exit(0);
   } else {  
     $username = $_SESSION['username'];
-    $role = $_SESSION['role'];
+    $role = $_SESSION['role'];    
   }
 
   $query = "";             
@@ -37,9 +37,18 @@
       $sql = "INSERT INTO product (code, name, stock, price, detail, image_path)
               VALUES ('$code', '$name', '$stock', '$price', '$detail', '$image_path');";
       $query = mysqli_query($connect, $sql);
+
+      $id = mysqli_insert_id($connect);
+      $sql2 = "INSERT INTO log (id_product, amount, status)
+            VALUES ('$id', '$stock', 0);";
+      $query2 = mysqli_query($connect, $sql2);
     } else {
       $query = "";
     }
+  }
+
+  if ($role == 0) {
+    include("./function/notification.php");
   }
 ?>
 
@@ -93,10 +102,14 @@
 
     <ul class="side-menu">
       <li>
+
+        <?php if ($role == 0) { ?>
         <a href="setting.php">
           <i class="bx bx-cog"></i>
           <span class="text">ตั้งค่า</span>
         </a>
+        <?php } ?>
+
       </li>
       <li>
         <a href="logout.php" class="logout">
@@ -117,10 +130,20 @@
       </div>
       <input type="checkbox" id="switch-mode" hidden />
       <label for="switch-mode" class="switch-mode"></label>
-      <a href="#" class="notification">
+
+      <?php 
+        if ($role == 0) {        
+      ?>
+      <a href="notification.php" class="notification">
         <i class="bx bxs-bell"></i>
-        <span class="num">8</span>
+        <?php 
+         if ($amount > 0) {
+          echo "<span class='num'>$amount</span>";
+         }
+        ?>
       </a>
+      <?php } ?>
+
       <a href="profile.php" class="profile">
         <?php echo $username; ?>
       </a>
@@ -171,7 +194,7 @@
 
             <div class="form-inline">
               <div class="form">
-                <input type="text" id="code" name="code" required />
+                <input type="text" id="code" name="code" required autofocus />
                 <label for="code">รหัส</label>
               </div>
               <div class="form">

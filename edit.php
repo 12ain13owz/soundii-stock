@@ -11,6 +11,16 @@
     $role = $_SESSION['role'];
   }
 
+  $id = $_GET['id'];
+  if (!$id) {
+    header( "location: index.php" );
+    exit(0);
+  }
+
+  $sql = "SELECT * FROM product WHERE product.id = '$id'";
+  $query = mysqli_query($connect, $sql);
+  $data = mysqli_fetch_array($query);
+
   if (isset($_POST['submit'])) {    
     $id = $_GET['id'];
     $name = $_POST['name'];    
@@ -46,7 +56,7 @@
 
     if ($select == 0) {
       $amount = $stock + $cut;
-    } elseif ($select == 1){
+    } elseif ($select == 1) {
       $amount = $stock - $cut;
     }
     
@@ -60,16 +70,10 @@
     header( "location: log.php" );
     exit(0);
   }
-               
-  $id = $_GET['id'];
-  if (!$id) {
-    header( "location: index.php" );
-    exit(0);
-  }
 
-  $sql = "SELECT * FROM product WHERE product.id = '$id'";
-  $query = mysqli_query($connect, $sql);
-  $data = mysqli_fetch_array($query);
+  if ($role == 0) {
+    include('./function/notification.php');
+  }              
 ?>
 
 <!DOCTYPE html>
@@ -122,10 +126,14 @@
 
     <ul class="side-menu">
       <li>
+
+        <?php if ($role == 0) { ?>
         <a href="setting.php">
           <i class="bx bx-cog"></i>
           <span class="text">ตั้งค่า</span>
         </a>
+        <?php } ?>
+
       </li>
       <li>
         <a href="logout.php" class="logout">
@@ -146,10 +154,20 @@
       </div>
       <input type="checkbox" id="switch-mode" hidden />
       <label for="switch-mode" class="switch-mode"></label>
-      <a href="#" class="notification">
+
+      <?php 
+        if ($role == 0) {        
+      ?>
+      <a href="notification.php" class="notification">
         <i class="bx bxs-bell"></i>
-        <span class="num">8</span>
+        <?php 
+         if ($amount > 0) {
+          echo "<span class='num'>$amount</span>";
+         }
+        ?>
       </a>
+      <?php } ?>
+
       <a href="profile.php" class="profile">
         <?php echo $username; ?>
       </a>
@@ -232,24 +250,6 @@
         </div>
       </div>
 
-      <?php 
-        if (isset($_POST['submit'])) {          
-      ?>
-
-      <div class="table-data">
-        <div class="order">
-          <?php             
-            if ($query) {
-              echo "<span class='message-success'>เพิ่มข้อมูลสำเร็จ</span>";
-            } else {
-              echo "<span class='message-error'>เพิ่มข้อมูลสำเร็จ</span>";
-            }             
-          ?>
-        </div>
-      </div>
-
-      <?php } ?>
-
       <div class="head-title" style="margin-top: 40px;">
         <div class="left">
           <h1>จัดการสต็อก</h1>
@@ -262,7 +262,7 @@
             <input type="number" id="stock2" name="stock" value="<?php echo $data['stock']; ?>" hidden />
 
             <div class="radio-box">
-              <input type="radio" name="select" id="option1" value="0">
+              <input type="radio" name="select" id="option1" value="0" checked>
               <input type="radio" name="select" id="option2" value="1">
 
               <label for="option1" class="option-1">
@@ -289,24 +289,6 @@
           </form>
         </div>
       </div>
-
-      <?php 
-        if (isset($_POST['submit'])) {          
-      ?>
-
-      <div class="table-data">
-        <div class="order">
-          <?php             
-            if ($query) {
-              echo "<span class='message-success'>เพิ่มข้อมูลสำเร็จ</span>";
-            } else {
-              echo "<span class='message-error'>เพิ่มข้อมูลสำเร็จ</span>";
-            }             
-          ?>
-        </div>
-      </div>
-
-      <?php } ?>
     </main>
     <!-- MAIN -->
   </section>
@@ -330,9 +312,5 @@ cut.addEventListener("input", function() {
   } else if (select == 1) {
     if (value > stock2) cut.value = stock2
   }
-
-
-
-
 })
 </script>

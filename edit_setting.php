@@ -1,6 +1,6 @@
 <?php 
-  include("./config/connect.php");
-  session_start();
+  include('./config/connect.php');
+  session_start();	
 
   $id = $_SESSION['id'];
   if (!$id) {
@@ -11,27 +11,50 @@
     $role = $_SESSION['role'];    
   }
 
-  if (isset($_POST['submit'])) {
-    $old_pass = $_POST['old_password'];
-    $new_pass = $_POST['new_password'];
-    $con_pass = $_POST['confirm_password'];
-    $message = "";
-    $status = false;
+  $id = $_GET['id'];
+  if (!$id) {
+    header( "location: setting.php" );
+    exit(0);
+  }
 
-    $sql = "SELECT * FROM account WHERE id = $id AND password = $old_pass";
+  $sql = "SELECT * FROM account WHERE account.id = '$id'";
+  $query = mysqli_query($connect, $sql);
+  $data = mysqli_fetch_array($query);
+
+  if (isset($_POST['submit'])) {    
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $select = $_POST['select'];
+
+    $sql = "SELECT * FROM account WHERE account.id = $id";
     $query = mysqli_query($connect, $sql);
-    $row = mysqli_num_rows($query);
+    $data = mysqli_fetch_array($query);
 
-    if ($row == 0) {
-      $message = "รหัสผ่านเก่าไม่ถูกต้อง";
-    } else if ($new_pass != $con_pass) {
-      $message = "รหัสผ่านใหม่ไม่ตรงกัน";
-    } else {
-      $sql = "UPDATE account SET password = '$new_pass' WHERE id = $id";
-      $query = mysqli_query($connect, $sql);     
-      $message = "เปลี่ยนรหัสผ่านสำเร็จ";
-      $status = true; 
+    if ($password == '') {
+      $password = $data['password'];
     }
+
+    if ($username == $data['username']) {
+      $sql = "UPDATE account SET password='$password', role=$select
+              WHERE account.id = '$id'";
+      $query = mysqli_query($connect, $sql);          
+      header( "location: setting.php" );
+      exit(0);
+    } else {
+      $sql = "SELECT * FROM account WHERE account.username = '$username';";
+      $query = mysqli_query($connect, $sql);
+      $rows = mysqli_num_rows($query);
+      $status = false;
+      $message = "Username ซ้ำ!";
+
+      if ($rows < 1) {
+        $sql = "UPDATE account SET username='$username',password='$password', role=$select
+                WHERE account.id = '$id'";
+        $query = mysqli_query($connect, $sql);          
+        header( "location: setting.php" );
+        exit(0);
+      }
+    }    
   }
 
   if ($role == 0) {
@@ -88,7 +111,7 @@
     </ul>
 
     <ul class="side-menu">
-      <li>
+      <li class="active">
 
         <?php if ($role == 0) { ?>
         <a href="setting.php">
@@ -141,7 +164,7 @@
     <main>
       <div class="head-title">
         <div class="left">
-          <h1>เปลี่ยนรหัสผ่าน</h1>
+          <h1>แก้ไขข้อมูลพนักงาน</h1>
         </div>
       </div>
 
@@ -154,8 +177,6 @@
           <?php             
             if ($status == false) {
               echo "<span class='message-error'>$message</span>";   
-            } else {
-              echo "<span class='message-success'>$message</span>";   
             }
           ?>
         </div>
@@ -165,20 +186,39 @@
 
       <div class="table-data">
         <div class="order">
-          <form action="profile.php?id=<?php echo $id; ?>" method="post">
-            <div class="form">
-              <input type="password" id="old_password" name="old_password" required autofocus />
-              <label for="old_password">รหัสเก่า</label>
+          <form action="edit_setting.php?id=<?php echo $data['id']; ?>" method="post">
+            <div class="radio-box">
+              <input type="radio" name="select" id="option1" value="0" <?php 
+                if ($data['role'] == 0) {
+                  echo "checked";
+                }
+              ?>>
+              <input type="radio" name="select" id="option2" value="1" <?php 
+                if ($data['role'] == 1) {
+                  echo "checked";
+                }
+              ?>>
+
+              <label for="option1" class="option-1">
+                <div class="dot"></div>
+                <div class="text">แอดมิน</div>
+              </label>
+              <label for="option2" class="option-2">
+                <div class="dot"></div>
+                <div class="text">พนักงาน</div>
+              </label>
             </div>
 
             <div class="form">
-              <input type="password" id="new_password" name="new_password" required />
-              <label for="new_password">รหัสใหม่</label>
+              <input type="text" id="username" name="username" value="<?php echo $data['username'] ;?>" <?php 
+                  { echo "class='valid'"; }
+                ?> required />
+              <label for="username">Username</label>
             </div>
 
             <div class="form">
-              <input type="password" id="confirm_password" name="confirm_password" required />
-              <label for="confirm_password">คอนเฟิร์ม รหัสใหม่</label>
+              <input type="password" id="password" name="password" />
+              <label for="password">Password</label>
             </div>
 
             <button type="submit" name="submit" class="btn-submit">Submit</button>
@@ -190,6 +230,7 @@
   </section>
   <!-- CONTENT -->
 </body>
+
 
 </html>
 

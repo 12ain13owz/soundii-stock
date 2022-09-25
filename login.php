@@ -45,7 +45,7 @@
       <div class="form">
         <h2 class="title">เข้าสู่ระบบ</h2>
         <div class="form">
-          <input type="text" id="username" name="username" required>
+          <input type="text" id="username" name="username" required autofocus>
           <label for="username">Username</label>
         </div>
         <div class="form">

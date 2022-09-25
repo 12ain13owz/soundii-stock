@@ -26,6 +26,7 @@ li {
   --grey: #eee;
   --dark-grey: #aaaaaa;
   --dark: #342e37;
+  --dark-page: #eee;
   --red: #db504a;
   --rose: #ff3333;
   --yellow: #ffce26;
@@ -44,6 +45,7 @@ body.dark {
   --light: #0c0c1e;
   --grey: #060714;
   --dark: #fbfbfb;
+  --dark-page: #363636;
   --light-blue-yellow: #ffce26;
   --shadow: #9658fe;
 }
@@ -142,7 +144,7 @@ body {
   white-space: nowrap;
   overflow-x: hidden;
 }
-#sidebar .side-menu.top li.active a {
+#sidebar .side-menu li.active a {
   color: var(--blue);
 }
 #sidebar.hide .side-menu li a {
@@ -152,7 +154,7 @@ body {
 #sidebar .side-menu li a.logout {
   color: var(--red);
 }
-#sidebar .side-menu.top li a:hover {
+#sidebar .side-menu li a:hover {
   color: var(--blue);
 }
 #sidebar .side-menu li a .bx {
@@ -462,7 +464,6 @@ body {
 #content main .table-data .order table td img {
   width: 46px;
   height: 46px;
-  border-radius: 50%;
   object-fit: cover;
 }
 #content main .table-data .order table td button,
@@ -1006,6 +1007,49 @@ body {
 
 .text-blue {
   color: var(--blue);
+}
+
+.page {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  padding: 1rem 0;
+  list-style: none;
+}
+
+.page li {
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  color: var(--dark);
+}
+
+.page a li {
+  background-color: var(--dark-page);
+  border: 1px solid var(--dark-page);
+  transition: 0.2s;
+}
+
+.page a:hover li {
+  color: var(--light-blue-yellow);
+  border-color: var(--light-blue-yellow);
+}
+
+.page a.active li {
+  background-color: var(--light-blue-yellow);
+  color: var(--light);
+  font-weight: 600;
+}
+
+.page a.disabled {
+  pointer-events: none;
+  cursor: default;
+}
+
+.page a.disabled li {
+  color: var(--dark-grey);
 }
 
 @media screen and (max-width: 576px) {

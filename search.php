@@ -8,7 +8,7 @@
     exit(0);
   } else {  
     $username = $_SESSION['username'];
-    $role = $_SESSION['role'];
+    $role = $_SESSION['role'];    
   }
 
   $data = '';
@@ -18,6 +18,10 @@
     $sql = "SELECT * FROM product WHERE code = '$code'";
     $query = mysqli_query($connect, $sql);
     $data = mysqli_fetch_array($query);    
+  }
+
+  if ($role == 0) {
+    include('./function/notification.php');
   }
 ?>
 
@@ -71,10 +75,14 @@
 
     <ul class="side-menu">
       <li>
+
+        <?php if ($role == 0) { ?>
         <a href="setting.php">
           <i class="bx bx-cog"></i>
           <span class="text">ตั้งค่า</span>
         </a>
+        <?php } ?>
+
       </li>
       <li>
         <a href="logout.php" class="logout">
@@ -95,10 +103,20 @@
       </div>
       <input type="checkbox" id="switch-mode" hidden />
       <label for="switch-mode" class="switch-mode"></label>
-      <a href="#" class="notification">
+
+      <?php 
+        if ($role == 0) {        
+      ?>
+      <a href="notification.php" class="notification">
         <i class="bx bxs-bell"></i>
-        <span class="num">8</span>
+        <?php 
+         if ($amount > 0) {
+          echo "<span class='num'>$amount</span>";
+         }
+        ?>
       </a>
+      <?php } ?>
+
       <a href="profile.php" class="profile">
         <?php echo $username; ?>
       </a>
@@ -133,7 +151,7 @@
               <tr>
                 <th>ชื่อสินค้า</th>
                 <th>รหัส</th>
-                <th>วันที่เพิ่ม</th>
+                <th>วันที่</th>
                 <th>จำนวน</th>
                 <th>ราคา</th>
                 <th>แก้ไข</th>
@@ -144,10 +162,14 @@
               <?php
                 if ($data) {
               ?>
-
               <tr>
                 <td>
-                  <?php echo "<img src = '$data[image_path]'/>"; ?>
+                  <?php if ($data['image_path']) {
+                      echo "<img src ='$data[image_path]'/>";
+                    } else {
+                      echo "<img src ='./img/default/default.png' />";
+                    }
+                  ?>
                   <p><?php echo "$data[name]"; ?></p>
                 </td>
                 <td><?php echo "$data[code]"; ?></td>
@@ -163,7 +185,7 @@
                   <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
                 </td>
                 <td>
-                  <?php echo "<a href='delete.php?id=$data[id]' class='pending'><i class='bx bxs-edit-alt'></i></a>"; ?>
+                  <?php echo "<a href='delete.php?id=$data[id]' class='pending'><i class='bx bx-x'></i></a>"; ?>
                 </td>
               </tr>
 
