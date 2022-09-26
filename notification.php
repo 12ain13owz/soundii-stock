@@ -155,6 +155,7 @@
             <thead>
               <tr>
                 <th>ชื่อสินค้า</th>
+                <th>แก้ไขโดย</th>
                 <th>รหัส</th>
                 <th>วันที่</th>
                 <th>จำนวน</th>
@@ -176,6 +177,7 @@
                   ?>
                   <p><?php echo "$data[name]"; ?></p>
                 </td>
+                <td><?php echo "$data[id_account]"; ?></td>
                 <td><?php echo "$data[code]"; ?></td>
                 <td>
                   <?php                    

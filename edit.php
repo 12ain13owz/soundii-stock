@@ -2,8 +2,8 @@
   include("./config/connect.php");
   session_start();
 
-  $id = $_SESSION['id'];
-  if (!$id) {
+  $id_account = $_SESSION['id'];
+  if (!$id_account) {
     header( "location: login.php" );
     exit(0);
   } else {  
@@ -63,8 +63,8 @@
     $sql = "UPDATE product SET stock='$amount' WHERE id = '$id'";
     $query = mysqli_query($connect, $sql);
 
-    $sql = "INSERT INTO log (id_product, amount, specs, status)
-            VALUES ('$id', '$cut', '$specs', '$select');";
+    $sql = "INSERT INTO log (id_product, id_account, amount, specs, status)
+            VALUES ('$id', '$username', '$cut', '$specs', '$select');";
     $query = mysqli_query($connect, $sql);
     
     header( "location: log.php" );

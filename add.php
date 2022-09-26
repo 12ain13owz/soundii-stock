@@ -38,9 +38,9 @@
               VALUES ('$code', '$name', '$stock', '$price', '$detail', '$image_path');";
       $query = mysqli_query($connect, $sql);
 
-      $id = mysqli_insert_id($connect);
-      $sql2 = "INSERT INTO log (id_product, amount, status)
-            VALUES ('$id', '$stock', 0);";
+      $id_product = mysqli_insert_id($connect);
+      $sql2 = "INSERT INTO log (id_product, id_account, amount, status)
+            VALUES ('$id_product', '$username', '$stock', 0);";
       $query2 = mysqli_query($connect, $sql2);
     } else {
       $query = "";

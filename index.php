@@ -155,7 +155,11 @@
                 <th>จำนวน</th>
                 <th>ราคา</th>
                 <th>แก้ไข</th>
-                <th>ลบ</th>
+                <?php
+                  if ($role == 0) {
+                    echo "<th>ลบ</th>";
+                  }
+                ?>
               </tr>
             </thead>
             <tbody>
@@ -185,11 +189,15 @@
                 <td>
                   <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
                 </td>
+                <?php 
+                  if ($role == 0) {                                      
+                ?>
                 <td>
                   <button type="button"
                     onclick="onPopup('<?php echo $data['name'];?>', '<?php echo 'delete.php?id='.$data['id'];?>')"
                     class="pending"><i class='bx bx-x'></i></a></button>
                 </td>
+                <?php } ?>
               </tr>
               <?php } ?>
             </tbody>
