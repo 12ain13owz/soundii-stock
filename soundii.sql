@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 26, 2022 at 01:56 PM
--- Server version: 10.4.24-MariaDB
--- PHP Version: 8.1.6
+-- Generation Time: Oct 16, 2022 at 03:15 PM
+-- Server version: 10.4.25-MariaDB
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -82,7 +82,12 @@ INSERT INTO `log` (`id`, `id_product`, `id_account`, `amount`, `specs`, `datetim
 (22, 96, '0', 5555, '5', '2022-09-26 17:31:08', 0, 1),
 (23, 96, 'admin', 1, '1', '2022-09-26 17:50:21', 1, 1),
 (24, 97, 'admin', 5, '', '2022-09-26 17:50:34', 0, 1),
-(25, 97, 'user', 1, '1', '2022-09-26 17:50:43', 1, 1);
+(25, 97, 'user', 1, '1', '2022-09-26 17:50:43', 1, 1),
+(26, 97, 'admin', 5, '1', '2022-10-16 17:29:58', 0, 1),
+(27, 96, 'admin', 1, '', '2022-10-16 17:32:44', 1, 1),
+(28, 98, 'admin', 77777, '', '2022-10-16 18:57:40', 0, 1),
+(29, 99, 'admin', 10, '', '2022-10-16 19:59:39', 0, 0),
+(30, 99, 'admin', 10, '', '2022-10-16 19:59:48', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -164,8 +169,27 @@ INSERT INTO `product` (`id`, `code`, `name`, `stock`, `price`, `detail`, `image_
 (93, '777', '777', 777, '7778', '777', '', '2022-09-25 18:01:55'),
 (94, '999', '999', 999, '999', '9', '', '2022-09-25 20:11:05'),
 (95, '12345', '123456', 123473, '1234568', '12345655123', '', '2022-09-25 20:11:13'),
-(96, '789', '7', 5567, '7', '7', './img/bg-genshin-2.jpg', '2022-09-25 20:18:22'),
-(97, '55555', '5', 4, '5', '5', '', '2022-09-26 17:50:34');
+(96, '789', '7', 5566, '7', '7', './img/bg-genshin-2.jpg', '2022-09-25 20:18:22'),
+(97, '55555', '555', 9, '5', '5', '', '2022-09-26 17:50:34'),
+(99, 'CS19', 'soundbar', 20, '990', '', '', '2022-10-16 19:59:39');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `setting`
+--
+
+CREATE TABLE `setting` (
+  `id` int(11) NOT NULL,
+  `notify` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `setting`
+--
+
+INSERT INTO `setting` (`id`, `notify`) VALUES
+(2, 10);
 
 --
 -- Indexes for dumped tables
@@ -191,6 +215,12 @@ ALTER TABLE `product`
   ADD UNIQUE KEY `code` (`code`);
 
 --
+-- Indexes for table `setting`
+--
+ALTER TABLE `setting`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -204,13 +234,19 @@ ALTER TABLE `account`
 -- AUTO_INCREMENT for table `log`
 --
 ALTER TABLE `log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+
+--
+-- AUTO_INCREMENT for table `setting`
+--
+ALTER TABLE `setting`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

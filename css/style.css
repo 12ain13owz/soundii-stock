@@ -274,6 +274,23 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+.notify {
+  position: absolute;
+  top: 5px;
+  left: 17px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 2px solid var(--light);
+  background: var(--red);
+  color: var(--light);
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+}
+
 #content nav .profile img {
   width: 36px;
   height: 36px;

@@ -1,5 +1,6 @@
 <?php 
   include("./config/connect.php");
+  include('./function/notify.php');
   session_start();
 
   $id_account = $_SESSION['id'];
@@ -120,6 +121,23 @@
         <a href="log.php">
           <i class='bx bx-spreadsheet'></i>
           <span class="text">ประวัติ</span>
+        </a>
+      </li>
+      <li>
+        <a href="report.php">
+          <i class='bx bx-file-blank'></i>
+          <span class="text">รายงาน</span>
+        </a>
+      </li>
+      <li>
+        <a href="stock.php" style="position: relative;">
+          <i class='bx bx-notification'></i>
+          <span class="text">ใกล้หมด</span>
+          <?php 
+            if ($stock11 > 0) {
+              echo "<span class='notify'>$stock11</span>";
+            }           
+          ?>
         </a>
       </li>
     </ul>
@@ -299,6 +317,7 @@
 
 <script src="./js/script.js"></script>
 <script src="./js/form.js"></script>
+<script src="./js/upload.js"></script>
 <script>
 const stock2 = Number(document.querySelector('#stock2').value)
 const cut = document.querySelector('#cut')

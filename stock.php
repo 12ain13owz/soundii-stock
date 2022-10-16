@@ -12,32 +12,7 @@
     $role = $_SESSION['role'];    
   }
   
-  if (isset($_POST['submit'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $select = $_POST['select'];
-
-    $sql = "SELECT * FROM account WHERE account.username = '$username';";
-    $query = mysqli_query($connect, $sql);
-    $rows = mysqli_num_rows($query);
-    $status = false;
-
-    if ($rows < 1) {
-      $sql = "INSERT INTO account (username, password, role)
-              VALUES ('$username', '$password', $select);";
-      $query = mysqli_query($connect, $sql);
-      $status = true;
-    }
-  }
-      
-  if (isset($_POST['submit_notify'])) {
-    $notify = $_POST['notify'];
-    $sql = "UPDATE setting SET notify=$notify";
-    $query = mysqli_query($connect, $sql);  
-    $notify11 = $notify;
-  }
-    
-  $perpage = 10;
+  $perpage = 5;
   $page = 1;
 
   if (isset($_GET['page'])) {
@@ -48,17 +23,17 @@
 
   $start = ($page - 1) * $perpage;
 
-  $sql = "SELECT * FROM account limit $start,$perpage";
+  $sql = "SELECT * FROM product WHERE product.stock <= $notify11 ORDER BY product.create_date DESC limit $start,$perpage";
   $query = mysqli_query($connect, $sql);
 
-  $sql2 = "SELECT COUNT(*) as total FROM account";
+  $sql2 = "SELECT COUNT(*) as total FROM product WHERE product.stock <= $notify11";
   $query2 = mysqli_query($connect, $sql2);
   $data2 = mysqli_fetch_assoc($query2);
   $total_page = ceil($data2['total'] / $perpage);
 
   if ($role == 0) {
     include('./function/notification.php');
-  }
+  }  
 ?>
 
 <!DOCTYPE html>
@@ -113,7 +88,7 @@
           <span class="text">รายงาน</span>
         </a>
       </li>
-      <li>
+      <li class="active">
         <a href="stock.php" style="position: relative;">
           <i class='bx bx-notification'></i>
           <span class="text">ใกล้หมด</span>
@@ -127,7 +102,7 @@
     </ul>
 
     <ul class="side-menu">
-      <li class="active">
+      <li>
 
         <?php if ($role == 0) { ?>
         <a href="setting.php">
@@ -180,54 +155,26 @@
     <main>
       <div class="head-title">
         <div class="left">
-          <h1>ตั้งค่า</h1>
-        </div>
-      </div>
-
-      <?php 
-        if (isset($_POST['submit'])) {          
-      ?>
-
-      <div class="table-data">
-        <div class="order">
-          <?php             
-            if ($status) {
-              echo "<span class='message-success'>เพิ่มพนักงานสำเร็จ</span>";
-            } else {
-              echo "<span class='message-error'>Username ซ้ำเพิ่มพนักงานไม่สำเร็จ</span>";
-            }             
-          ?>
-        </div>
-      </div>
-
-      <?php } ?>
-
-      <div class="table-data">
-        <div class="order">
-          <div class="head">
-            <h3>แจ้งเตือน</h3>
-          </div>
-          <form action="setting.php" method="post">
-            <div class="form">
-              <input type="number" id="notify" name="notify" value="<?php echo $notify11; ?>" required />
-            </div>
-            <button type="submit" name="submit_notify" class="btn-submit">Submit</button>
-          </form>
+          <h1>สินค้าใกล้หมด</h1>
         </div>
       </div>
 
       <div class="table-data">
         <div class="order">
-          <div class="head">
-            <h3>พนักงานทั้งหมด</h3>
-          </div>
           <table>
             <thead>
               <tr>
-                <th>Uername</th>
-                <th>Role</th>
+                <th>ชื่อสินค้า</th>
+                <th>รหัส</th>
+                <th>วันที่เพิ่ม</th>
+                <th>จำนวน</th>
+                <th>ราคา</th>
                 <th>แก้ไข</th>
-                <th>ลบ</th>
+                <?php
+                  if ($role == 0) {
+                    echo "<th>ลบ</th>";
+                  }
+                ?>
               </tr>
             </thead>
             <tbody>
@@ -236,22 +183,36 @@
               ?>
 
               <tr>
-                <td><?php echo "$data[username]"; ?></td>
-                <td><?php 
-                  $role = "พนักงาน";
-                  if ($data['role'] == 0) {
-                    $role = "แอดมิน";
-                  }
-                  echo "$role"; 
-                ?></td>
                 <td>
-                  <?php echo "<a href='edit_setting.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
+                  <?php if ($data['image_path']) {
+                    echo "<img src ='$data[image_path]'/>";
+                  } else {
+                    echo "<img src ='./img/default/default.png' />";
+                  }
+                  ?>
+                  <p><?php echo "$data[name]"; ?></p>
                 </td>
+                <td><?php echo "$data[code]"; ?></td>
+                <td>
+                  <?php                    
+                    $date = date('d/m/Y', strtotime($data["create_date"]));
+                    echo "$date"; 
+                  ?>
+                </td>
+                <td><?php echo "$data[stock]"; ?></td>
+                <td><?php echo "$data[price]"; ?></td>
+                <td>
+                  <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
+                </td>
+                <?php 
+                  if ($role == 0) {                                      
+                ?>
                 <td>
                   <button type="button"
-                    onclick="onPopup('<?php echo $data['username'];?>', '<?php echo 'delete_setting.php?id='.$data['id'];?>')"
+                    onclick="onPopup('<?php echo $data['name'];?>', '<?php echo 'delete.php?id='.$data['id'];?>')"
                     class="pending"><i class='bx bx-x'></i></a></button>
                 </td>
+                <?php } ?>
               </tr>
               <?php } ?>
             </tbody>
@@ -263,14 +224,14 @@
                   echo "<a href='#' class='disabled'><li>ก่อนหน้า</li></a>";
                 } else {
                   $pervious = $page - 1;
-                  echo "<a href='index.php?page=$pervious'><li>ก่อนหน้า</li></a>";
+                  echo "<a href='stock.php?page=$pervious'><li>ก่อนหน้า</li></a>";
                 }
 
                 if ($page == $total_page ) {
                   echo "<a href='#' class='disabled'><li>ถัดไป</li></a>";
                 } else {
                   $next = $page + 1;
-                  echo "<a href='index.php?page=$next'><li>ถัดไป</li></a>";
+                  echo "<a href='stock.php?page=$next'><li>ถัดไป</li></a>";
                 }
 
                 $page_pervious = $page - 1;
@@ -281,17 +242,17 @@
                 if ($total_page < 7) {
                   for ($i = 1 ; $i <= $total_page; $i++) {                    
                     if ($i == $page) {
-                      echo "<a href='index.php?page=$i' class='active'><li>$i</li></a>";
+                      echo "<a href='stock.php?page=$i' class='active'><li>$i</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$i'><li>$i</li></a>";
+                      echo "<a href='stock.php?page=$i'><li>$i</li></a>";
                     }                    
                   }
                 } else {        
                   $p = 1;                                 
                   if ($page == $p) {
-                    echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                    echo "<a href='stock.php?page=$p' class='active'><li>$p</li></a>";
                   } else {
-                    echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                    echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                   }               
                                     
                   $p = 2;  
@@ -299,37 +260,37 @@
                     echo "<a href='#'><li>...</li></a>";
                   } else {                                        
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                     }      
                   }                    
                                
                   $p = 3; 
                   if ($page >= 4 && $page_last > 2) {                      
-                    echo "<a href='index.php?page=$page_pervious'><li>$page_pervious</li></a>";
+                    echo "<a href='stock.php?page=$page_pervious'><li>$page_pervious</li></a>";
                   } else if ($page >= 4 && $page_last <= 2) {
                     $p = $total_page - 4;                    
                     echo "<a href='index.php?page=$p'><li>$p</li></a>";
                   } else {                                      
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                     }  
                   }    
 
                   $p = 4;
                   if ($page_last <= 2) {
                     $p = $total_page - 3;                    
-                    echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                    echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                   } else {                   
                     if ($page >= 4 && $page_last >= 3) {                      
-                      echo "<a href='index.php?page=$page' class='active'><li>$page</li></a>";                       
+                      echo "<a href='stock.php?page=$page' class='active'><li>$page</li></a>";                       
                     } else if ($page >= 4 && $page_last < 3) {                         
-                      echo "<a href='index.php?page=$page'><li>$page</li></a>";
+                      echo "<a href='stock.php?page=$page'><li>$page</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                     }     
                   } 
                     
@@ -338,15 +299,15 @@
                     $p = $total_page - 2;                   
                     
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                     }                                            
                   } else {                                       
                     if ($page >= 4) {                                                            
-                      echo "<a href='index.php?page=$page_next'><li>$page_next</li></a>";
+                      echo "<a href='stock.php?page=$page_next'><li>$page_next</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                     }
                   }                                                 
                                      
@@ -355,16 +316,16 @@
                   } else {                      
                     $p = $total_page - 1;
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='stock.php?page=$p'><li>$p</li></a>";
                     }                     
                   }                  
                                       
                   if ($total_page == $page) {
-                    echo "<a href='index.php?page=$total_page' class='active'><li>$total_page</li></a>";
+                    echo "<a href='stock.php?page=$total_page' class='active'><li>$total_page</li></a>";
                   } else {
-                    echo "<a href='index.php?page=$total_page'><li>$total_page</li></a>";
+                    echo "<a href='stock.php?page=$total_page'><li>$total_page</li></a>";
                   }                                                                                                    
                 }                            
               ?>
@@ -372,43 +333,7 @@
           </div>
         </div>
       </div>
-
-      <div class="table-data">
-        <div class="order">
-          <div class="head">
-            <h3>เพิ่มพนักงาน</h3>
-          </div>
-          <form action="setting.php" method="post">
-            <div class="radio-box">
-              <input type="radio" name="select" id="option1" value="0">
-              <input type="radio" name="select" id="option2" value="1" checked>
-
-              <label for="option1" class="option-1">
-                <div class="dot"></div>
-                <div class="text">แอดมิน</div>
-              </label>
-              <label for="option2" class="option-2">
-                <div class="dot"></div>
-                <div class="text">พนักงาน</div>
-              </label>
-            </div>
-
-            <div class="form">
-              <input type="text" id="username" name="username" required />
-              <label for="username">Username</label>
-            </div>
-
-            <div class="form">
-              <input type="password" id="password" name="password" required />
-              <label for="password">Password</label>
-            </div>
-
-            <button type="submit" name="submit" class="btn-submit">Submit</button>
-          </form>
-        </div>
-      </div>
     </main>
-
     <!-- MAIN -->
   </section>
   <!-- CONTENT -->
@@ -429,4 +354,3 @@
 
 <script src="./js/script.js"></script>
 <script src="./js/popup.js"></script>
-<script src="./js/form.js"></script>
