@@ -146,6 +146,7 @@
             <div class="radio-box">
               <input type="radio" name="select" id="option1" value="0" checked>
               <input type="radio" name="select" id="option2" value="1">
+              <input type="radio" name="select" id="option3" value="2">
 
               <label for="option1" class="option-1">
                 <div class="dot"></div>
@@ -154,6 +155,10 @@
               <label for="option2" class="option-2">
                 <div class="dot"></div>
                 <div class="text">วันที่แก้ไข</div>
+              </label>
+              <label for="option3" class="option-3">
+                <div class="dot"></div>
+                <div class="text">ตัดสต็อก</div>
               </label>
             </div>
 

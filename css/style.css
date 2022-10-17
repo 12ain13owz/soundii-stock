@@ -1003,17 +1003,20 @@ body {
 }
 
 #option1:checked ~ .option-1,
-#option2:checked ~ .option-2 {
+#option2:checked ~ .option-2,
+#option3:checked ~ .option-3 {
   border-color: var(--light-blue-yellow);
 }
 
 #option1:checked ~ .option-1 .text,
-#option2:checked ~ .option-2 .text {
+#option2:checked ~ .option-2 .text,
+#option3:checked ~ .option-3 .text {
   color: var(--light-blue-yellow);
 }
 
 #option1:checked ~ .option-1 .dot::before,
-#option2:checked ~ .option-2 .dot::before {
+#option2:checked ~ .option-2 .dot::before,
+#option3:checked ~ .option-3 .dot::before {
   background: var(--light-blue-yellow);
   transform: translate(-50%, -50%) scale(1);
 }
