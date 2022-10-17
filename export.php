@@ -24,7 +24,7 @@
 
     fseek($f, 0); 
 
-    header('Content-Type: text/csv'); 
+    header('Content-Type: text/csv; charset=utf-8'); 
     header('Content-Disposition: attachment; filename="' . $filename . '";'); 
     fpassthru($f); 
   }
@@ -53,7 +53,7 @@
     fseek($f, 0); 
     
  
-    header('Content-Type: text/csv'); 
+    header('Content-Type: text/csv; charset=utf-8'); 
     header('Content-Disposition: attachment; filename="' . $filename . '";'); 
     fpassthru($f); 
   }
