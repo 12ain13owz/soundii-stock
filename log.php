@@ -330,16 +330,6 @@
     <!-- MAIN -->
   </section>
   <!-- CONTENT -->
-
-  <div class="popup-box">
-    <i class='bx bx-info-circle'></i>
-    <h1 id="popup-name">ชื่อ</h1>
-    <label>ต้องการลบใช่ไหม?</label>
-    <div class="popup-btn">
-      <a href="#" class="btn-cancel">ยกเลิก</a>
-      <a href="#" class="btn-ok">ตกลง</a>
-    </div>
-  </div>
 </body>
 
 

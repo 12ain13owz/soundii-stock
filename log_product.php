@@ -3,15 +3,21 @@
   include('./function/notify.php');
   session_start();	
 
-  $id = $_SESSION['id'];
-  if (!$id) {
+  $id_account = $_SESSION['id'];
+  if (!$id_account) {
     header( "location: login.php" );
     exit(0);
   } else {  
     $username = $_SESSION['username'];
     $role = $_SESSION['role'];    
   }
-  
+
+  $id = $_GET['id'];
+  if (!$id) {
+    header( "location: index.php" );
+    exit(0);
+  }
+
   $perpage = 5;
   $page = 1;
 
@@ -22,18 +28,21 @@
   }
 
   $start = ($page - 1) * $perpage;
+  
+  $sql = "SELECT * FROM log INNER JOIN product ON log.id_product = product.id WHERE log.id_product = $id ORDER BY log.datetime DESC limit $start,$perpage"; 
+  $query = mysqli_query($connect, $sql);   
+  $data_product = mysqli_fetch_array($query);
+  $name = $data_product['name'];
+  $stock = $data_product['stock'];  
 
-  $sql = "SELECT * FROM product ORDER BY product.create_date DESC limit $start,$perpage";
-  $query = mysqli_query($connect, $sql);
-
-  $sql2 = "SELECT COUNT(*) as total FROM product";
+  $sql2 = "SELECT COUNT(*) as total FROM log Where log.id_product = $id";
   $query2 = mysqli_query($connect, $sql2);
   $data2 = mysqli_fetch_assoc($query2);
   $total_page = ceil($data2['total'] / $perpage);
 
   if ($role == 0) {
     include('./function/notification.php');
-  }  
+  }
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +67,7 @@
       <span class="text">Speker</span>
     </a>
     <ul class="side-menu top">
-      <li class="active">
+      <li>
         <a href="index.php">
           <i class="bx bxs-dashboard"></i>
           <span class="text">หน้าแรก</span>
@@ -95,7 +104,7 @@
           <?php 
             if ($stock11 > 0) {
               echo "<span class='notify'>$stock11</span>";
-            }
+            }           
           ?>
         </a>
       </li>
@@ -155,71 +164,58 @@
     <main>
       <div class="head-title">
         <div class="left">
-          <h1>หน้าแรก</h1>
+          <h1>ประวัติ <?php echo $name; ?> คงเหลือ <?php echo $stock ;?></h1>
         </div>
       </div>
-
+      <h2>
+      </h2>
       <div class="table-data">
         <div class="order">
-          <div class="head">
-            <h3>สินค้าทั้งหมด</h3>
-          </div>
           <table>
             <thead>
               <tr>
                 <th>ชื่อสินค้า</th>
+                <th>แก้ไขโดย</th>
                 <th>รหัส</th>
-                <th>วันที่เพิ่ม</th>
+                <th>วันที่</th>
                 <th>จำนวน</th>
-                <th>ราคา</th>
-                <th>ประวัติ</th>
-                <th>แก้ไข</th>
-                <?php
-                  if ($role == 0) {
-                    echo "<th>ลบ</th>";
-                  }
-                ?>
+                <th>รายละเอียด</th>
               </tr>
             </thead>
             <tbody>
               <?php
-                while ($data = mysqli_fetch_array($query)) {                
+                $query = mysqli_query($connect, $sql);
+                while ($data = mysqli_fetch_array($query)) {                                 
               ?>
 
               <tr>
                 <td>
                   <?php if ($data['image_path']) {
-                    echo "<img src ='$data[image_path]'/>";
-                  } else {
-                    echo "<img src ='./img/default/default.png' />";
-                  }
+                      echo "<img src ='$data[image_path]'/>";
+                    } else {
+                      echo "<img src ='./img/default/default.png' />";
+                    }
                   ?>
                   <p><?php echo "$data[name]"; ?></p>
                 </td>
+                <td><?php echo "$data[id_account]"; ?></td>
                 <td><?php echo "$data[code]"; ?></td>
                 <td>
                   <?php                    
-                    $date = date('d/m/Y', strtotime($data["create_date"]));
+                    $date = date('d/m/Y', strtotime($data["datetime"]));
                     echo "$date"; 
                   ?>
                 </td>
-                <td><?php echo "$data[stock]"; ?></td>
-                <td><?php echo "$data[price]"; ?></td>
                 <td>
-                  <?php echo "<a href='log_product.php?id=$data[id]' class='process'><i class='bx bx-history'></i></i></a>"; ?>
+                  <?php 
+                    if ($data['status'] == 0) {
+                      echo "<span class='text-blue'>$data[amount]</span>";
+                    } else if ($data['status'] == 1) {
+                      echo "<span class='text-red'>-$data[amount]</span>";
+                    }
+                  ?>
                 </td>
-                <td>
-                  <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
-                </td>
-                <?php 
-                  if ($role == 0) {                                      
-                ?>
-                <td>
-                  <button type="button"
-                    onclick="onPopup('<?php echo $data['name'];?>', '<?php echo 'delete.php?id='.$data['id'];?>')"
-                    class="pending"><i class='bx bx-x'></i></a></button>
-                </td>
-                <?php } ?>
+                <td><?php echo "$data[specs]"; ?></td>
               </tr>
               <?php } ?>
             </tbody>
@@ -231,14 +227,14 @@
                   echo "<a href='#' class='disabled'><li>ก่อนหน้า</li></a>";
                 } else {
                   $pervious = $page - 1;
-                  echo "<a href='index.php?page=$pervious'><li>ก่อนหน้า</li></a>";
+                  echo "<a href='log_product.php?page=$pervious&id=$id'><li>ก่อนหน้า</li></a>";
                 }
 
                 if ($page == $total_page ) {
                   echo "<a href='#' class='disabled'><li>ถัดไป</li></a>";
                 } else {
                   $next = $page + 1;
-                  echo "<a href='index.php?page=$next'><li>ถัดไป</li></a>";
+                  echo "<a href='log_product.php?page=$next&id=$id'><li>ถัดไป</li></a>";
                 }
 
                 $page_pervious = $page - 1;
@@ -249,17 +245,17 @@
                 if ($total_page < 7) {
                   for ($i = 1 ; $i <= $total_page; $i++) {                    
                     if ($i == $page) {
-                      echo "<a href='index.php?page=$i' class='active'><li>$i</li></a>";
+                      echo "<a href='log_product.php?page=$i&id=$id' class='active'><li>$i</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$i'><li>$i</li></a>";
+                      echo "<a href='log_product.php?page=$i&id=$id'><li>$i</li></a>";
                     }                    
                   }
                 } else {        
                   $p = 1;                                 
                   if ($page == $p) {
-                    echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                    echo "<a href='log_product.php?page=$p&id=$id' class='active'><li>$p</li></a>";
                   } else {
-                    echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                    echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                   }               
                                     
                   $p = 2;  
@@ -267,37 +263,37 @@
                     echo "<a href='#'><li>...</li></a>";
                   } else {                                        
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                     }      
                   }                    
                                
                   $p = 3; 
                   if ($page >= 4 && $page_last > 2) {                      
-                    echo "<a href='index.php?page=$page_pervious'><li>$page_pervious</li></a>";
+                    echo "<a href='log_product.php?page=$page_pervious'><li>$page_pervious</li></a>";
                   } else if ($page >= 4 && $page_last <= 2) {
                     $p = $total_page - 4;                    
-                    echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                    echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                   } else {                                      
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                     }  
                   }    
 
                   $p = 4;
                   if ($page_last <= 2) {
                     $p = $total_page - 3;                    
-                    echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                    echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                   } else {                   
                     if ($page >= 4 && $page_last >= 3) {                      
-                      echo "<a href='index.php?page=$page' class='active'><li>$page</li></a>";                       
+                      echo "<a href='log_product.php?page=$page&id=$id' class='active'><li>$page</li></a>";                       
                     } else if ($page >= 4 && $page_last < 3) {                         
-                      echo "<a href='index.php?page=$page'><li>$page</li></a>";
+                      echo "<a href='log_product.php?page=$page&id=$id'><li>$page</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                     }     
                   } 
                     
@@ -306,15 +302,15 @@
                     $p = $total_page - 2;                   
                     
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                     }                                            
                   } else {                                       
                     if ($page >= 4) {                                                            
-                      echo "<a href='index.php?page=$page_next'><li>$page_next</li></a>";
+                      echo "<a href='log_product.php?page=$page_next&id=$id'><li>$page_next</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                     }
                   }                                                 
                                      
@@ -323,16 +319,16 @@
                   } else {                      
                     $p = $total_page - 1;
                     if ($page == $p) {
-                      echo "<a href='index.php?page=$p' class='active'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id' class='active'><li>$p</li></a>";
                     } else {
-                      echo "<a href='index.php?page=$p'><li>$p</li></a>";
+                      echo "<a href='log_product.php?page=$p&id=$id'><li>$p</li></a>";
                     }                     
                   }                  
                                       
                   if ($total_page == $page) {
-                    echo "<a href='index.php?page=$total_page' class='active'><li>$total_page</li></a>";
+                    echo "<a href='log_product.php?page=$total_page&id=$id' class='active'><li>$total_page</li></a>";
                   } else {
-                    echo "<a href='index.php?page=$total_page'><li>$total_page</li></a>";
+                    echo "<a href='log_product.php?page=$total_page&id=$id'><li>$total_page</li></a>";
                   }                                                                                                    
                 }                            
               ?>
@@ -340,24 +336,13 @@
           </div>
         </div>
       </div>
+
     </main>
     <!-- MAIN -->
   </section>
   <!-- CONTENT -->
-
-  <div class="popup-box">
-    <i class='bx bx-info-circle'></i>
-    <h1 id="popup-name">ชื่อ</h1>
-    <label>ต้องการลบใช่ไหม?</label>
-    <div class="popup-btn">
-      <a href="#" class="btn-cancel">ยกเลิก</a>
-      <a href="#" class="btn-ok">ตกลง</a>
-    </div>
-  </div>
 </body>
-
 
 </html>
 
 <script src="./js/script.js"></script>
-<script src="./js/popup.js"></script>

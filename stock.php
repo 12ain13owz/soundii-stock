@@ -169,6 +169,7 @@
                 <th>วันที่เพิ่ม</th>
                 <th>จำนวน</th>
                 <th>ราคา</th>
+                <th>ประวัติ</th>
                 <th>แก้ไข</th>
                 <?php
                   if ($role == 0) {
@@ -201,6 +202,9 @@
                 </td>
                 <td><?php echo "$data[stock]"; ?></td>
                 <td><?php echo "$data[price]"; ?></td>
+                <td>
+                  <?php echo "<a href='log_product.php?id=$data[id]' class='process'><i class='bx bx-history'></i></i></a>"; ?>
+                </td>
                 <td>
                   <?php echo "<a href='edit.php?id=$data[id]' class='completed'><i class='bx bx-edit'></i></a>"; ?>
                 </td>
